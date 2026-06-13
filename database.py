@@ -24,12 +24,20 @@ def calculate_health(temperature: float, vibration: float):
     temp = temperature or 0
     vib = vibration or 0
     
+    score = 100.0
+    if temp > 85:
+        score -= (temp - 85) * 1.5
+    if vib > 6:
+        score -= (vib - 6) * 5.0
+        
+    score = max(0, min(100, int(score)))
+    
     if temp > 100 or vib > 10:
-        return "critical", 42 # arbitrary low score for critical
+        return "critical", score
     elif temp > 85 or vib > 6:
-        return "warning", 75 # arbitrary medium score for warning
+        return "warning", score
     else:
-        return "healthy", 98 # arbitrary high score for healthy
+        return "healthy", score
 
 async def fetch_summary():
     query = """

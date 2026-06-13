@@ -9,7 +9,9 @@ from database import (
     fetch_devices,
     fetch_latest_telemetry,
     fetch_device_trends,
-    fetch_throughput
+    fetch_throughput,
+    fetch_top_anomalous_devices,
+    fetch_regions_summary
 )
 from config import settings
 
@@ -72,10 +74,24 @@ async def get_device_trends(device_id: str, hours: int = Query(1, description="H
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/devices/top-anomalous")
+async def get_top_anomalous():
+    try:
+        return await fetch_top_anomalous_devices()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/dashboard/throughput")
 async def get_throughput():
     try:
         return await fetch_throughput()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/dashboard/regions")
+async def get_regions():
+    try:
+        return await fetch_regions_summary()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

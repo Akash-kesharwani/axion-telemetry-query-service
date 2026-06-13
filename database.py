@@ -26,11 +26,11 @@ def calculate_health(temperature: float, vibration: float):
     
     score = 100.0
     if temp > 85:
-        score -= (temp - 85) * 1.5
+        score -= (temp - 85) * 1.0
     if vib > 6:
-        score -= (vib - 6) * 5.0
+        score -= (vib - 6) * 3.0
         
-    score = max(0, min(100, int(score)))
+    score = max(10, min(100, int(score)))
     
     if temp > 100 or vib > 10:
         return "critical", score

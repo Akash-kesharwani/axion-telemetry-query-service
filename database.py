@@ -75,8 +75,9 @@ async def fetch_regions_summary():
     for r in rows:
         region = r["refinery_region"]
         if region not in regions:
-            regions[region] = {"online": 0, "alerts": 0}
+            regions[region] = {"total_devices": 0, "online_devices": 0, "alert_devices": 0}
             
+        regions[region]["total_devices"] += 1
         status, _ = calculate_health(r["temperature"], r["vibration"])
         
         # Consider online if seen in last 2 minutes
@@ -87,12 +88,12 @@ async def fetch_regions_summary():
                 is_online = True
                 
         if is_online:
-            regions[region]["online"] += 1
+            regions[region]["online_devices"] += 1
             
         if status in ["warning", "critical"]:
-            regions[region]["alerts"] += 1
+            regions[region]["alert_devices"] += 1
             
-    return [{"region": k, "online": v["online"], "alerts": v["alerts"]} for k, v in regions.items()]
+    return [{"region": k, "total_devices": v["total_devices"], "online_devices": v["online_devices"], "alert_devices": v["alert_devices"]} for k, v in regions.items()]
 
 async def fetch_devices():
     query = """

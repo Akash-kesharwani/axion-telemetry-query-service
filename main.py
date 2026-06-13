@@ -55,10 +55,10 @@ async def get_devices():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/devices/latest")
-async def get_latest_device_data(deviceId: str = None):
+@app.get("/devices/{device_id}/latest")
+async def get_latest_device_data(device_id: str):
     try:
-        data = await fetch_latest_telemetry(deviceId)
+        data = await fetch_latest_telemetry(device_id)
         if not data:
             raise HTTPException(status_code=404, detail="No telemetry found")
         return data

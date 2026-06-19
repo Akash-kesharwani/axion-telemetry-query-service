@@ -139,8 +139,7 @@ async def fetch_top_anomalous_devices():
         )
         SELECT *
         FROM LatestDevices
-        ORDER BY (temperature + (vibration * 10)) DESC
-        LIMIT 5;
+        ORDER BY (temperature + (vibration * 10)) DESC;
     """
     rows = await pool.fetch(query)
     
@@ -148,9 +147,12 @@ async def fetch_top_anomalous_devices():
     for r in rows:
         d = dict(r)
         status, health_score = calculate_health(d.get("temperature"), d.get("vibration"))
-        d["status"] = status
-        d["health_score"] = health_score
-        devices.append(d)
+        if status in ["warning", "critical"]:
+            d["status"] = status
+            d["health_score"] = health_score
+            devices.append(d)
+            if len(devices) == 5:
+                break
         
     return devices
 

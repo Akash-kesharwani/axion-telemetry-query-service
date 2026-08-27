@@ -1,46 +1,47 @@
-name: Build & Push Docker Image
+name: "Docker build and push"
 
-on:
+on: 
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+    - main
 
-env:
-  DOCKER_IMAGE: devopsinsiders/axion-telemetry-query-service
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  build-and-push:
-    name: Build & Push to Docker Hub
+  docker-build-push:
     runs-on: ubuntu-latest
 
+    env:
+      IMAGE_NAME: axion-telemetry-query-service
+      IMAGE_TAG: v1
+      ACR_NAME: akacr1212134
+      ACR_LOGIN_SERVER: akacr1212134.azurecr.io
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v5.0.0
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    - name: Azure Login
+      uses: Azure/login@v2.3.0
+      with:
+        client-id: 9094f10b-1e2b-4bfc-97ad-28d19bdb4171
+        tenant-id: 70215518-e920-4fbb-bce9-8e471101e454
+        subscription-id: fbb258e2-cd4d-4bd2-9c7d-a04b5cf93aaa
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Login to ACR
+      run: |
+        az acr login --name $ACR_NAME
 
-      - name: Extract metadata (tags, labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=sha,prefix=
-            type=raw,value=latest,enable={{is_default_branch}}
+    - name: Build docker image
+      run: |
+        docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+    - name: Tag image with ACR
+      run: |
+        docker tag $IMAGE_NAME:$IMAGE_TAG $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+    - name: image push to ACR
+      run: |
+        docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG

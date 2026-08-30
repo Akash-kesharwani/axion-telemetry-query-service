@@ -30,6 +30,7 @@ jobs:
         tenant-id: 70215518-e920-4fbb-bce9-8e471101e454
         subscription-id: fbb258e2-cd4d-4bd2-9c7d-a04b5cf93aaa
 
+        
     - name: Login to ACR
       run: |
         az acr login --name $ACR_NAME

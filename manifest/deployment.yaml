@@ -16,7 +16,7 @@ spec:
       - name: axion-telemetry-query-service
         image: akacr1212134.azurecr.io/axion-telemetry-query-service:v2          
         ports:
-        -  containePort: 8000
+        -  containerPort: 8000
         
 
 

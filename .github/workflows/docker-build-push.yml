@@ -18,6 +18,7 @@ jobs:
       IMAGE_TAG: v1
       ACR_NAME: akacr1212134
       ACR_LOGIN_SERVER: akacr1212134.azurecr.io
+      
 
     steps:
     - name: Checkout
